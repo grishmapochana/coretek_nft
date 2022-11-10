@@ -1,6 +1,8 @@
 import React from "react";
 import Client from "../helper/ipfs";
-import { etherToWei, Listing_fee, nftMarketplaceInstance } from "../helper/web3function";
+import {
+  nftInstance
+} from "../helper/web3function";
 import { useWeb3React } from "@web3-react/core";
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
@@ -22,9 +24,6 @@ interface InitialState {
 }
 
 declare let window: any;
-
-var marketPlaceAddress = process.env.NFT_MARKET_CONTRACT_ADDRESS;
-var nftAddress = process.env.NFT_CONTRACT_ADDRESS;
 
 export default function Mint() {
   const { account, active } = useWeb3React();
@@ -84,16 +83,10 @@ export default function Mint() {
     const uri = await Client.add(metaData);
     const url = `https://coretek-nft.infura-ipfs.io/ipfs/${uri.path}`;
 
-    console.log({url})
 
     if (window.ethereum && active) {
-      const nftInstance = await nftMarketplaceInstance(account);
-      const tx = await nftInstance!.sellItem(
-        url,
-        etherToWei(formData.price),
-        nftAddress,
-        { from: account, value: etherToWei(Listing_fee) }
-      );
+      const nft_instance = await nftInstance(account);
+      const tx = await nft_instance!.mintToken(url);
       await tx.wait();
       toast.success(`${formData.name} minted successfully !`);
     } else {

@@ -2,33 +2,29 @@ import { ethers } from "ethers";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import React from "react";
-import NFTMarketContractAbi from "../../contracts/ABI/NFT_MARKETPLACE.json";
-import { etherToWei, getFormatedNft, nftMarketplaceInstance } from "../../helper/web3function";
+import {
+  etherToWei,
+  getFormatedMarketplaceNft,
+  increaseAllowance,
+  nftMarketplaceInstance
+} from "../../helper/web3function";
 import Hardhat from "../../assets/hardhat.png";
 import { useWeb3React } from "@web3-react/core";
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
-import { capitalizeFirstLetter } from "../../helper";
+import { capitalizeFirstLetter, shortenAddress } from "../../helper";
 
 declare let window: any;
 var marketPlaceAddress = process.env.NFT_MARKET_CONTRACT_ADDRESS;
+var nftAddress = process.env.NFT_CONTRACT_ADDRESS;
+var tokenContractAddress = process.env.TOKEN_ADDRESS;
 
-interface Nft {
-  attributes: [];
-  creator: string;
-  desc: string;
-  image: string;
-  name: string;
-  price: string;
-  token: number;
-  owner: string;
-}
 export default function Page() {
   const { active, account } = useWeb3React();
   const router = useRouter();
   const id = router.query.id;
 
-  const [nftData, setNftData] = React.useState<Nft>();
+  const [nftData, setNftData] = React.useState<any>();
   React.useEffect(() => {
     if (id) getNFT();
   }, [id]);
@@ -37,8 +33,9 @@ export default function Page() {
     if (window.ethereum) {
       const marketplaceInstance = await nftMarketplaceInstance(account);
       try {
-        const nftItems = await marketplaceInstance!.Items(id);
-        var formattedNft = await getFormatedNft(nftItems);
+        const nftItems =
+          await marketplaceInstance!.getLatestMarketItemByTokenId(id);
+        var formattedNft = await getFormatedMarketplaceNft(nftItems[0], "");
         setNftData(formattedNft);
       } catch (err) {
         console.log(err);
@@ -48,16 +45,36 @@ export default function Page() {
 
   const handleBuy = async () => {
     if (window.ethereum) {
-      const marketplaceInstance = await nftMarketplaceInstance(account);
       try {
-        const tx = await marketplaceInstance!.buyItem(id, {
-          from: account,
-          value: etherToWei(nftData?.price),
-        });
-        await tx.wait();
-        router.push("/collected");
-      } catch (err:any) {
-        toast.error(capitalizeFirstLetter(err.reason));
+        const marketplaceFee = localStorage.getItem("listingFee");
+        const allowance =
+          parseFloat(nftData?.price) + parseFloat(marketplaceFee!);
+        const increase_allowance = await increaseAllowance(
+          account!,
+          marketPlaceAddress!,
+          etherToWei(allowance)
+        );
+        await increase_allowance.wait();
+        if (increase_allowance) {
+          const marketplaceInstance = await nftMarketplaceInstance(account);
+
+          const tx = await marketplaceInstance!.createMarketSale(
+            nftAddress,
+            tokenContractAddress,
+            nftData.itemId,
+            {
+              from: account
+            }
+          );
+          await tx.wait();
+          router.push("/collected");
+        }
+      } catch (err: any) {
+        if (err.code === -32603) {
+          toast.error("Insufficient Balance");
+        } else {
+          toast.error(capitalizeFirstLetter(err.reason));
+        }
       }
     }
   };
@@ -71,7 +88,7 @@ export default function Page() {
         Buy
       </div>
     );
-  }
+  };
 
   return (
     <>
@@ -86,21 +103,25 @@ export default function Page() {
           <div className="my-auto">
             <p className="text-6xl font-semibold mb-4">{nftData?.name}</p>
             <p className="text-md mb-6">{nftData?.desc}</p>
-            <p className="text-md mb-6">Owner Address: {nftData?.owner}</p>
+            <p className="text-md mb-6">Owner Address: {nftData?.owner && shortenAddress(nftData?.owner)}</p>
             <p className="text-4xl mb-6 flex gap-4">
-              <Image src={Hardhat} width={30} height={2} />
-              {nftData?.price} ETH
+              <Image src={Hardhat} width={36} height={28} />
+              {nftData?.price} MAC
             </p>
             {nftData?.attributes && <p className="mb-2">Attributes</p>}
             <div className="flex gap-4 w-full flex-wrap mb-6">
-              {nftData?.attributes && nftData?.attributes.map((item: any, index) => (
-                <div className="bg-blue-200 w-36 py-2 text-center rounded-lg border border-blue-500 cursor-default" key={index}>
-                  <div className="text-xs text-blue-500 uppercase">
-                    {item.trait_type}
+              {nftData?.attributes &&
+                nftData?.attributes.map((item: any, index: number) => (
+                  <div
+                    className="bg-blue-200 w-36 py-2 text-center rounded-lg border border-blue-500 cursor-default"
+                    key={index}
+                  >
+                    <div className="text-xs text-blue-500 uppercase">
+                      {item.trait_type}
+                    </div>
+                    <div>{item.value}</div>
                   </div>
-                  <div>{item.value}</div>
-                </div>
-              ))}
+                ))}
             </div>
 
             {active ? (

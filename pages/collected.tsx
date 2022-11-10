@@ -1,8 +1,7 @@
 import React from "react";
 import { useWeb3React } from "@web3-react/core";
-import { getFormatedNft, nftMarketplaceInstance } from "../helper/web3function";
-import Hardhat from "../assets/hardhat.png";
-import Image from "next/image";
+import { getFormatedNft, nftInstance } from "../helper/web3function";
+import { shortenAddress } from "../helper";
 import Link from "next/link";
 
 declare let window: any;
@@ -17,17 +16,18 @@ export default function Collected() {
 
   const getNFT = async () => {
     if (window.ethereum) {
-      const nftInstance = await nftMarketplaceInstance(account);
+      const nft_Instance = await nftInstance(account);
       try {
-        const mintedNft = await nftInstance!.fetchOwnerItemsListed({
+        const mintedNft = await nft_Instance!.getTokensOwnedByMe({
           from: account,
         });
         const formattedNFTList = await Promise.all(
           mintedNft.map((nft: any) => {
-            var res = getFormatedNft(nft);
+            var res = getFormatedNft(nft, account);
             return res;
           })
         );
+        console.log({formattedNFTList});
         setNftData(formattedNFTList);
       } catch (err) {
         console.log(err);
@@ -35,10 +35,9 @@ export default function Collected() {
     }
   };
 
-  console.log({nftData})
   return (
     <div className="p-20 bg-gray-100 min-h-screen">
-      <div className="m-2 text-5xl text-center">NFT Collected</div>
+      <div className="m-2 text-5xl text-center">NFT Owned by the {account && shortenAddress(account)}</div>
       <div className="grid grid-cols-5 gap-6 my-10">
         {nftData.map((item: any, index: number) => {
           return (
@@ -56,10 +55,10 @@ export default function Collected() {
                 </div>
                 <div className="px-4 py-2 flex justify-between">
                   <div className="font-semibold">{item.name}</div>
-                  <div className="flex gap-2">
+                  {/* <div className="flex gap-2">
                     <Image src={Hardhat} width={28} height={4} />
                     <div>{item.price}</div>
-                  </div>
+                  </div> */}
                 </div>
                 <div className="px-4 py-2 text-xs">
                   {item.desc.substring(0, 100)}

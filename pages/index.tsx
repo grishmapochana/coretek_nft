@@ -3,7 +3,13 @@ import type { NextPage } from "next";
 import Image from "next/image";
 
 import Hardhat from "../assets/hardhat.png";
-import { getFormatedNft, nftMarketplaceInstance } from "../helper/web3function";
+import {
+  getFormatedMarketplaceNft,
+  getFormatedNft,
+  nftMarketplaceInstance,
+  tokenInstance,
+  weiToEther,
+} from "../helper/web3function";
 import Link from "next/link";
 import { useWeb3React } from "@web3-react/core";
 
@@ -21,10 +27,11 @@ const Home: NextPage = () => {
     if (window.ethereum) {
       try {
         const marketplaceInstance = await nftMarketplaceInstance(account);
-        const unSoldNfts = await marketplaceInstance!.fetchMarketItems();
+        const unSoldNfts =
+          await marketplaceInstance!.fetchAvailableMarketItems();
         const formattedNFTList = await Promise.all(
           unSoldNfts.map((nft: any) => {
-            var res = getFormatedNft(nft);
+            var res = getFormatedMarketplaceNft(nft, account);
             return res;
           })
         );
@@ -52,13 +59,11 @@ const Home: NextPage = () => {
                         className="w-96 h-80 object-cover hover:scale-110 ease-in duration-300"
                       />
                     </div>
-                    <div className="px-4 py-2 grid grid-rows-3 justify-between">
-                      <div className="font-semibold col-span-2">
-                        {item.name}
-                      </div>
+                    <div className="px-4 py-2 flex flex-row justify-between">
+                      <div className="font-semibold">{item.name}</div>
                       <div className="flex gap-2">
-                        <Image src={Hardhat} width={28} height={4} />
-                        <div>{item.price}</div>
+                        <Image src={Hardhat} width={28} height={28} />
+                        <div className="text-right my-auto">{item.price}</div>
                       </div>
                     </div>
                     <div className="px-4 py-2 text-xs">
