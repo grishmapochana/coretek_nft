@@ -87,7 +87,6 @@ export default function Created() {
   };
 
   const handleCancelSell = async (itemId: number) => {
-    console.log("Handle Cancel sell");
     try {
       const nftMarketplace_instance = await nftMarketplaceInstance(account);
       const tx = await nftMarketplace_instance!.cancelMarketItem(
@@ -105,6 +104,7 @@ export default function Created() {
       <div className="grid grid-cols-5 gap-6 my-10">
         {nftData.length > 0 ? (
           nftData.map((item: any, index: number) => {
+            console.log({owner:item.owner, account})
             return (
               <div
                 className="shadow-lg rounded-lg overflow-hidden hover:shadow-2xl"

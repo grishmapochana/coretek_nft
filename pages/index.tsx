@@ -48,6 +48,7 @@ const Home: NextPage = () => {
         <div className="m-2 text-5xl text-center">Marketplace</div>
         <div className="grid grid-cols-5 gap-6 my-10">
           {nftData.map((item: any, index: number) => {
+            console.log({image: item.image})
             return (
               item && (
                 <Link href={`/nft/${item.token}`} key={index}>
@@ -67,7 +68,7 @@ const Home: NextPage = () => {
                       </div>
                     </div>
                     <div className="px-4 py-2 text-xs">
-                      {item.desc.substring(0, 100)}
+                      {item.desc}
                     </div>
                   </div>
                 </Link>

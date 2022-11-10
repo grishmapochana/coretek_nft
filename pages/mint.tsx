@@ -1,11 +1,11 @@
 import React from "react";
-import Client from "../helper/ipfs";
 import {
   nftInstance
 } from "../helper/web3function";
 import { useWeb3React } from "@web3-react/core";
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
+import { createJSONFile, uploadFile } from "../helper/file-ipfs";
 
 const initialState = {
   name: "",
@@ -14,7 +14,6 @@ const initialState = {
   image: "",
   attributes: [],
 };
-
 interface InitialState {
   name: string;
   price: number;
@@ -66,27 +65,36 @@ export default function Mint() {
 
   const handleUpload = async (e: any) => {
     const file = e.target.files[0];
-    const added = await Client.add(file, {
-      progress: (prog: any) => console.log(`recieved: ${prog}`),
-    });
-    setFormData({ ...formData, image: added.path });
+    const url = await uploadFile(file);
+    console.log({url});
+    
+    // const added = await Client.add(file, {
+    //   progress: (prog: any) => console.log(`recieved: ${prog}`),
+    // });
+    setFormData({ ...formData, image: url! });
   };
 
   const handleMint = async () => {
-    const { name, description, image } = formData;
-    const metaData = JSON.stringify({
+    const { name, description, image} = formData;
+    const reqObj = {
       name: name,
       description: description,
       image: image,
       attributes: attributes,
-    });
-    const uri = await Client.add(metaData);
-    const url = `https://coretek-nft.infura-ipfs.io/ipfs/${uri.path}`;
+    };
+    const file = createJSONFile(reqObj, name);
+    const uri = await uploadFile(file!);
+    console.log("📌 👉 👨‍💻 handleMint 👨‍💻 uri", uri);
+    return;
+    // const metaData = JSON.stringify(reqObj);
+
+    // const uri = await Client.add(metaData);
+    // const url = `https://coretek-nft.infura-ipfs.io/ipfs/${uri.path}`;
 
 
     if (window.ethereum && active) {
       const nft_instance = await nftInstance(account);
-      const tx = await nft_instance!.mintToken(url);
+      const tx = await nft_instance!.mintToken(uri);
       await tx.wait();
       toast.success(`${formData.name} minted successfully !`);
     } else {
