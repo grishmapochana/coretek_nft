@@ -35,7 +35,7 @@ export default function Page() {
   const getNFT = async () => {
     try {
       setLoading(true);
-      const {erc20Contract, nftContract, marketplaceContract, signer} = getAppState();
+      const {erc20Contract, nftContract, marketplaceContract, signer} = await getAppState();
       // const [erc20Contract, nftContract, marketplaceContract] = getContracts();
       // const [_, signer] = getProviderNSigner();
       if (erc20Contract && nftContract && marketplaceContract && signer && id) {

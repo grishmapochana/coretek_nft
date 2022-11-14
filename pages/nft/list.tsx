@@ -20,7 +20,7 @@ export default function MintedNFTs({ address }: { address?: string }) {
   const _getMintedNFTs = async (addr?: string) => {
     try {
       setLoading(true);
-      const {address, nftContract} = getAppState();
+      const {address, nftContract} = await getAppState();
       if (nftContract && addr && address) {
         let mintedTokens: { tokenId: number; owner: string }[] = [];
         if (!addr) {
@@ -66,7 +66,7 @@ export default function MintedNFTs({ address }: { address?: string }) {
   };
 
   const _transferNFT = async (from: string, to: string, tokenId: number) => {
-    const { nftContract, signer } = getAppState();
+    const { nftContract, signer } = await getAppState();
     if (nftContract && signer) {
       const tx = await nftContract.connect(signer).transferFrom(from, to, tokenId);
       const txReceipt = await tx.wait();
@@ -76,9 +76,9 @@ export default function MintedNFTs({ address }: { address?: string }) {
 
   const getMyNFTs = async () => {
     selectedNFTRef.current.value = "MY"
-    let appState = getAppState();
-    if (appState && appState.address) {
-      await _getMintedNFTs(appState.address);
+    let {address} = await getAppState();
+    if (address) {
+      await _getMintedNFTs(address);
     }
   };
 

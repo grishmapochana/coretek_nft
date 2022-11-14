@@ -18,7 +18,7 @@ export interface AppState {
 }
 
 interface AppContextState {
-  getAppState: () => AppState;
+  getAppState: () => Promise<AppState>;
   updateAppState: (up: Partial<AppState>) => void;
   resetAppState: () => void;
   connectMetamask: () => Promise<void>;
@@ -38,7 +38,7 @@ interface AppContextState {
 }
 
 const AppStateContext = createContext<AppContextState>({
-  getAppState: () => ({}),
+  getAppState: async () => ({}),
   updateAppState: (up: Partial<AppState>) => {},
   resetAppState: () => {},
   connectMetamask: async () => {},
@@ -61,7 +61,7 @@ export default function AppStateProvider({ children }: { children: any }) {
     return [appState.provider, appState.signer];
   }
 
-  function getAppState(): AppState {
+  async function getAppState(): Promise<AppState> {
     return { ...appStateRef.current };
   }
 
