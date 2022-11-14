@@ -1,5 +1,4 @@
 import React from "react";
-import { useWeb3React } from "@web3-react/core";
 import {
   etherToWei,
   getFormatedNft,
@@ -11,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
 import Created from "../components/created";
 import Collected from "../components/collected";
+import { useAppState } from "../helper/AppStateProvider";
 
 var nftAddress = process.env.NFT_CONTRACT_ADDRESS;
 var tokenContractAddress = process.env.TOKEN_ADDRESS;
@@ -20,7 +20,11 @@ var nftMarketplaceAddress = process.env.NFT_MARKET_CONTRACT_ADDRESS;
 declare let window: any;
 
 export default function Minted() {
-  const { account } = useWeb3React();
+  
+  const { getAppState } = useAppState();
+  const { address } = getAppState();
+  const account = address;
+
   const [nftData, setNftData] = React.useState<{ [key: string]: any }>([]);
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [data, setData] = React.useState<any>("");

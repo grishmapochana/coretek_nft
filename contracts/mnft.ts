@@ -4,7 +4,7 @@ import networkInfo from "./network";
 
 const contractInfo: ContractInfo = {
   name: "MNFT",
-  address: "0xf0187F763EBFDBB23Ea83f858e5EDCA2FE55742b",
+  address: "0x18dE0A63D9F8ebd1c85f597B4419aa77718DE29d",
   habi: [
     "constructor(address _marketplaceAddress)",
     "event Approval(address indexed owner, address indexed approved, uint256 indexed tokenId)",
@@ -13,6 +13,9 @@ const contractInfo: ContractInfo = {
     "event Transfer(address indexed from, address indexed to, uint256 indexed tokenId)",
     "function approve(address to, uint256 tokenId)",
     "function balanceOf(address owner) view returns (uint256)",
+    "function getAllTokenInfos() view returns (tuple(uint256 tokenId, address owner)[])",
+    "function getAllTokenInfosOwnedBy(address addr) view returns (tuple(uint256 tokenId, address owner)[])",
+    "function getAllTokenInfosOwnedByMe() view returns (tuple(uint256 tokenId, address owner)[])",
     "function getAllTokens() view returns (uint256[])",
     "function getAllTokensOwnedBy(address addr) view returns (uint256[])",
     "function getApproved(uint256 tokenId) view returns (address)",

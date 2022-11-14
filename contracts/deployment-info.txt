@@ -1,22 +1,21 @@
 
 
 {
-  "datetime": "11/11/2022, 18:10:41",
+  "datetime": "14/11/2022, 16:52:39",
   "network": {
     "name": "bsc_testnet_s1_2",
     "chainId": 97,
     "url": "https://data-seed-prebsc-2-s1.binance.org:8545/"
   },
-  "erc20ContractAddr": "0x9a9B5043ADb0B82eC86E7cC42D1a2C5C2203Ac23",
-  "nftContractAddr": "0xf0187F763EBFDBB23Ea83f858e5EDCA2FE55742b",
-  "marketplaceContractAddr": "0x1b27aa2AE7670a4DE65F2605C3A7E2E4fCA7F006",
+  "erc20ContractAddr": "0x0a694872c6Bef531c805B968B4343Cb01aD66591",
+  "nftContractAddr": "0x18dE0A63D9F8ebd1c85f597B4419aa77718DE29d",
+  "marketplaceContractAddr": "0x0d287f61B3dB151b0403A634BaD66ae593fB9078",
   "owner": {
     "mtkOwner": "0x16c6078cce90Dd48316c74d71c8C4d67a98Eeb52",
     "address": "0x16c6078cce90Dd48316c74d71c8C4d67a98Eeb52",
     "balance": {
       "mtk": "1000000.0",
-      "eth": "2.02428279"
+      "eth": "1.78644313"
     }
   }
 }
-

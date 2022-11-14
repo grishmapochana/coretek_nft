@@ -142,6 +142,80 @@ const _abi = [
   },
   {
     type: "function",
+    name: "getAllTokenInfos",
+    constant: true,
+    stateMutability: "view",
+    payable: false,
+    inputs: [],
+    outputs: [
+      {
+        type: "tuple[]",
+        components: [
+          {
+            type: "uint256",
+            name: "tokenId",
+          },
+          {
+            type: "address",
+            name: "owner",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    type: "function",
+    name: "getAllTokenInfosOwnedBy",
+    constant: true,
+    stateMutability: "view",
+    payable: false,
+    inputs: [
+      {
+        type: "address",
+        name: "addr",
+      },
+    ],
+    outputs: [
+      {
+        type: "tuple[]",
+        components: [
+          {
+            type: "uint256",
+            name: "tokenId",
+          },
+          {
+            type: "address",
+            name: "owner",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    type: "function",
+    name: "getAllTokenInfosOwnedByMe",
+    constant: true,
+    stateMutability: "view",
+    payable: false,
+    inputs: [],
+    outputs: [
+      {
+        type: "tuple[]",
+        components: [
+          {
+            type: "uint256",
+            name: "tokenId",
+          },
+          {
+            type: "address",
+            name: "owner",
+          },
+        ],
+      },
+    ],
+  },
+  {
+    type: "function",
     name: "getAllTokens",
     constant: true,
     stateMutability: "view",

@@ -4,7 +4,7 @@ import networkInfo from "./network";
 
 const contractInfo: ContractInfo = {
   name: "MToken",
-  address: "0x9a9B5043ADb0B82eC86E7cC42D1a2C5C2203Ac23",
+  address: "0x0a694872c6Bef531c805B968B4343Cb01aD66591",
   habi: [
     "constructor()",
     "event Approval(address indexed owner, address indexed spender, uint256 value)",

@@ -31,6 +31,9 @@ export interface MNFTInterface extends utils.Interface {
   functions: {
     "approve(address,uint256)": FunctionFragment;
     "balanceOf(address)": FunctionFragment;
+    "getAllTokenInfos()": FunctionFragment;
+    "getAllTokenInfosOwnedBy(address)": FunctionFragment;
+    "getAllTokenInfosOwnedByMe()": FunctionFragment;
     "getAllTokens()": FunctionFragment;
     "getAllTokensOwnedBy(address)": FunctionFragment;
     "getApproved(uint256)": FunctionFragment;
@@ -55,6 +58,9 @@ export interface MNFTInterface extends utils.Interface {
     nameOrSignatureOrTopic:
       | "approve"
       | "balanceOf"
+      | "getAllTokenInfos"
+      | "getAllTokenInfosOwnedBy"
+      | "getAllTokenInfosOwnedByMe"
       | "getAllTokens"
       | "getAllTokensOwnedBy"
       | "getApproved"
@@ -82,6 +88,18 @@ export interface MNFTInterface extends utils.Interface {
   encodeFunctionData(
     functionFragment: "balanceOf",
     values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAllTokenInfos",
+    values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAllTokenInfosOwnedBy",
+    values: [PromiseOrValue<string>]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getAllTokenInfosOwnedByMe",
+    values?: undefined
   ): string;
   encodeFunctionData(
     functionFragment: "getAllTokens",
@@ -165,6 +183,18 @@ export interface MNFTInterface extends utils.Interface {
 
   decodeFunctionResult(functionFragment: "approve", data: BytesLike): Result;
   decodeFunctionResult(functionFragment: "balanceOf", data: BytesLike): Result;
+  decodeFunctionResult(
+    functionFragment: "getAllTokenInfos",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAllTokenInfosOwnedBy",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getAllTokenInfosOwnedByMe",
+    data: BytesLike
+  ): Result;
   decodeFunctionResult(
     functionFragment: "getAllTokens",
     data: BytesLike
@@ -322,6 +352,19 @@ export interface MNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<[BigNumber]>;
 
+    getAllTokenInfos(
+      overrides?: CallOverrides
+    ): Promise<[[BigNumber, string] & { tokenId: BigNumber; owner: string }[]]>;
+
+    getAllTokenInfosOwnedBy(
+      addr: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[[BigNumber, string] & { tokenId: BigNumber; owner: string }[]]>;
+
+    getAllTokenInfosOwnedByMe(
+      overrides?: CallOverrides
+    ): Promise<[[BigNumber, string] & { tokenId: BigNumber; owner: string }[]]>;
+
     getAllTokens(overrides?: CallOverrides): Promise<[BigNumber[]]>;
 
     getAllTokensOwnedBy(
@@ -415,6 +458,19 @@ export interface MNFT extends BaseContract {
     overrides?: CallOverrides
   ): Promise<BigNumber>;
 
+  getAllTokenInfos(
+    overrides?: CallOverrides
+  ): Promise<[BigNumber, string] & { tokenId: BigNumber; owner: string }[]>;
+
+  getAllTokenInfosOwnedBy(
+    addr: PromiseOrValue<string>,
+    overrides?: CallOverrides
+  ): Promise<[BigNumber, string] & { tokenId: BigNumber; owner: string }[]>;
+
+  getAllTokenInfosOwnedByMe(
+    overrides?: CallOverrides
+  ): Promise<[BigNumber, string] & { tokenId: BigNumber; owner: string }[]>;
+
   getAllTokens(overrides?: CallOverrides): Promise<BigNumber[]>;
 
   getAllTokensOwnedBy(
@@ -507,6 +563,19 @@ export interface MNFT extends BaseContract {
       owner: PromiseOrValue<string>,
       overrides?: CallOverrides
     ): Promise<BigNumber>;
+
+    getAllTokenInfos(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber, string] & { tokenId: BigNumber; owner: string }[]>;
+
+    getAllTokenInfosOwnedBy(
+      addr: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<[BigNumber, string] & { tokenId: BigNumber; owner: string }[]>;
+
+    getAllTokenInfosOwnedByMe(
+      overrides?: CallOverrides
+    ): Promise<[BigNumber, string] & { tokenId: BigNumber; owner: string }[]>;
 
     getAllTokens(overrides?: CallOverrides): Promise<BigNumber[]>;
 
@@ -648,6 +717,15 @@ export interface MNFT extends BaseContract {
       overrides?: CallOverrides
     ): Promise<BigNumber>;
 
+    getAllTokenInfos(overrides?: CallOverrides): Promise<BigNumber>;
+
+    getAllTokenInfosOwnedBy(
+      addr: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<BigNumber>;
+
+    getAllTokenInfosOwnedByMe(overrides?: CallOverrides): Promise<BigNumber>;
+
     getAllTokens(overrides?: CallOverrides): Promise<BigNumber>;
 
     getAllTokensOwnedBy(
@@ -739,6 +817,17 @@ export interface MNFT extends BaseContract {
 
     balanceOf(
       owner: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getAllTokenInfos(overrides?: CallOverrides): Promise<PopulatedTransaction>;
+
+    getAllTokenInfosOwnedBy(
+      addr: PromiseOrValue<string>,
+      overrides?: CallOverrides
+    ): Promise<PopulatedTransaction>;
+
+    getAllTokenInfosOwnedByMe(
       overrides?: CallOverrides
     ): Promise<PopulatedTransaction>;
 

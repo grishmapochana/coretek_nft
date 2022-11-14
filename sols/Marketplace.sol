@@ -112,6 +112,7 @@ contract Marketplace is ReentrancyGuard {
         _tokensCanceled.increment();
     }
 
+
     function getLatestMarketItemByTokenId(uint256 tokenId) public view returns (MarketItem memory, bool) {
         uint256 itemsCount = _marketItemIds.current();
 
@@ -133,6 +134,7 @@ contract Marketplace is ReentrancyGuard {
         uint256 price = marketItemIdToMarketItem[marketItemId].price;
         uint256 tokenId = marketItemIdToMarketItem[marketItemId].tokenId;
 
+        // marketItemIdToMarketItem[marketItemId].seller = payable(msg.sender); // ??? TODO
         marketItemIdToMarketItem[marketItemId].owner = payable(msg.sender);
         marketItemIdToMarketItem[marketItemId].sold = true;
 
@@ -143,9 +145,7 @@ contract Marketplace is ReentrancyGuard {
         MToken(erc20ContractAddress).transfer(owner, listingFee);
     }
 
-
     function fetchAvailableMarketItems() public view returns (MarketItem[] memory) {
-        // console.log("------------fetchAvailableMarketItems------------");
         uint256 itemsCount = _marketItemIds.current();
         uint256 soldItemsCount = _tokensSold.current();
         uint256 canceledItemsCount = _tokensCanceled.current();
@@ -182,7 +182,6 @@ contract Marketplace is ReentrancyGuard {
     function fetchSellingMarketItems() public view returns (MarketItem[] memory) {
         return fetchMarketItemsByAddressProperty("seller");
     }
-
 
     function fetchOwnedMarketItems() public view returns (MarketItem[] memory) {
         return fetchMarketItemsByAddressProperty("owner");

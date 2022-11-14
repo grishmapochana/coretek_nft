@@ -15,6 +15,11 @@ contract MNFT is ERC721URIStorage {
 
     event TokenMinted(uint256 indexed tokenId, string tokenURI, address marketplaceAddress);
 
+    struct Tokeninfo {
+        uint256 tokenId;
+        address owner;
+    }
+
     constructor(address _marketplaceAddress) ERC721("MNFT", "MNFT") {
         marketplaceAddress = _marketplaceAddress;
     }
@@ -27,7 +32,6 @@ contract MNFT is ERC721URIStorage {
         _setTokenURI(newItemId, tokenURI);
 
         // console.log("Unlock time is %o and block timestamp is %o", unlockTime, block.timestamp);
-        
         // Give the marketplace approval to transact NFTs between users
         setApprovalForAll(marketplaceAddress, true);
 
@@ -110,5 +114,54 @@ contract MNFT is ERC721URIStorage {
     function getLatestToken() public view returns (uint256) {
         uint256 numberOfExistingTokens = _tokenIds.current();
         return numberOfExistingTokens;
+    }
+
+    function getAllTokenInfosOwnedByMe() public view returns (Tokeninfo[] memory) {
+        uint256 numberOfExistingTokens = _tokenIds.current();
+        uint256 numberOfTokensOwned = balanceOf(msg.sender);
+        Tokeninfo[] memory ownedTokenInfos = new Tokeninfo[](numberOfTokensOwned);
+
+        uint256 currentIndex = 0;
+        for (uint256 i = 0; i < numberOfExistingTokens; i++) {
+            uint256 tokenId = i + 1;
+            address tokenOwner = ownerOf(tokenId);
+            if (tokenOwner != msg.sender) continue;
+            ownedTokenInfos[currentIndex] = Tokeninfo(tokenId, tokenOwner);
+            currentIndex += 1;
+        }
+
+        return ownedTokenInfos;
+    }
+
+    function getAllTokenInfosOwnedBy(address addr) public view returns (Tokeninfo[] memory) {
+        uint256 numberOfExistingTokens = _tokenIds.current();
+        uint256 numberOfTokensOwned = balanceOf(addr);
+        Tokeninfo[] memory ownedTokenInfos = new Tokeninfo[](numberOfTokensOwned);
+
+        uint256 currentIndex = 0;
+        for (uint256 i = 0; i < numberOfExistingTokens; i++) {
+            uint256 tokenId = i + 1;
+            address tokenOwner = ownerOf(tokenId);
+            if (tokenOwner != addr) continue;
+            ownedTokenInfos[currentIndex] = Tokeninfo(tokenId, tokenOwner);
+            currentIndex += 1;
+        }
+
+        return ownedTokenInfos;
+    }
+
+    function getAllTokenInfos() public view returns (Tokeninfo[] memory) {
+        uint256 numberOfExistingTokens = _tokenIds.current();
+        Tokeninfo[] memory ownedTokenInfos = new Tokeninfo[](numberOfExistingTokens);
+
+        uint256 currentIndex = 0;
+        for (uint256 i = 0; i < numberOfExistingTokens; i++) {
+            uint256 tokenId = i + 1;
+            address tokenOwner = ownerOf(tokenId);
+            ownedTokenInfos[currentIndex] = Tokeninfo(tokenId, tokenOwner);
+            currentIndex += 1;
+        }
+
+        return ownedTokenInfos;
     }
 }

@@ -41,3 +41,25 @@
 
 ======================================
 
+{
+  "datetime": "14/11/2022, 16:52:39",
+  "network": {
+    "name": "bsc_testnet_s1_2",
+    "chainId": 97,
+    "url": "https://data-seed-prebsc-2-s1.binance.org:8545/"
+  },
+  "erc20ContractAddr": "0x0a694872c6Bef531c805B968B4343Cb01aD66591",
+  "nftContractAddr": "0x18dE0A63D9F8ebd1c85f597B4419aa77718DE29d",
+  "marketplaceContractAddr": "0x0d287f61B3dB151b0403A634BaD66ae593fB9078",
+  "owner": {
+    "mtkOwner": "0x16c6078cce90Dd48316c74d71c8C4d67a98Eeb52",
+    "address": "0x16c6078cce90Dd48316c74d71c8C4d67a98Eeb52",
+    "balance": {
+      "mtk": "1000000.0",
+      "eth": "1.78644313"
+    }
+  }
+}
+
+======================================
+

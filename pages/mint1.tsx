@@ -1,5 +1,4 @@
 import React from "react";
-import * as IPFS from "ipfs-core";
 
 const initialState = {
   name: "",
@@ -59,24 +58,24 @@ export default function Mint() {
   };
 
   const handleUpload = async (e: any) => {
-    console.log({ e: e.target.files[0] });
-    const file = e.target.files[0];
-    const ipfs = await IPFS.create();
-    const { cid } = await ipfs.add(file);
-    setFormData({ ...formData, image: cid.toString() });
+    // console.log({ e: e.target.files[0] });
+    // const file = e.target.files[0];
+    // const ipfs = await IPFS.create();
+    // const { cid } = await ipfs.add(file);
+    // setFormData({ ...formData, image: cid.toString() });
   };
 
   const handleMint = async () => {
-    const ipfs = await IPFS.create();
-    const { name, description, attributes, image } = formData;
-    const data = JSON.stringify({
-      name: name,
-      description: description,
-      image: image,
-      attributes: attributes,
-    });
-    const uri = await ipfs.add(data);
-    console.log(uri);
+    // const ipfs = await IPFS.create();
+    // const { name, description, attributes, image } = formData;
+    // const data = JSON.stringify({
+    //   name: name,
+    //   description: description,
+    //   image: image,
+    //   attributes: attributes,
+    // });
+    // const uri = await ipfs.add(data);
+    // console.log(uri);
   };
 
   return (

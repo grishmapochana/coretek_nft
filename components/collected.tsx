@@ -1,38 +1,37 @@
 import React from "react";
-import { useWeb3React } from "@web3-react/core";
 import { etherToWei, getFormatedNft, nftInstance, nftMarketplaceInstance, tokenInstance } from "../helper/web3function";
 import { toast, ToastContainer } from "react-toastify";
 import NftCard from "./nftCard";
-declare let window: any;
-
+import { useAppState } from "../helper/AppStateProvider";
 
 var nftAddress = process.env.NFT_CONTRACT_ADDRESS;
 var tokenContractAddress = process.env.TOKEN_ADDRESS;
 var nftMarketplaceAddress = process.env.NFT_MARKET_CONTRACT_ADDRESS;
 
 export default function Collected() {
-  const { account } = useWeb3React();
+  const {getAppState} = useAppState();
   const [nftData, setNftData] = React.useState<{ [key: string]: any }>([]);
 
   const [showModal, setShowModal] = React.useState<boolean>(false);
   const [data, setData] = React.useState<any>("");
   const [price, setPrice] = React.useState<any>(0);
+  
+  const { address } = getAppState();
 
-  React.useEffect(() => {
-    if (account) getNFT();
-    console.log("hi there")
-  }, [account]);
+  React.useEffect(() => {  
+    if (address) getNFT();
+  }, [address]);
 
   const getNFT = async () => {
-    if (window.ethereum) {
-      const nft_Instance = await nftInstance(account);
+    if ((window as any).ethereum) {
+      const nft_Instance = await nftInstance(address);
       try {
         const mintedNft = await nft_Instance!.getTokensOwnedByMe({
-          from: account,
+          from: address,
         });
         const formattedNFTList = await Promise.all(
           mintedNft.map((nft: any) => {
-            var res = getFormatedNft(nft, account);
+            var res = getFormatedNft(nft, address);
             return res;
           })
         );
@@ -55,16 +54,16 @@ export default function Collected() {
 
   const handleSell = async () => {
     try {
-      const token_instance = await tokenInstance(account);
+      const token_instance = await tokenInstance(address);
       const marketplaceFee = localStorage.getItem("listingFee");
       const res = await token_instance!.increaseAllowance(
         nftMarketplaceAddress,
         etherToWei(marketplaceFee),
-        { from: account }
+        { from: address }
       );
       await res.wait();
       if (res) {
-        const nftMarketplace_instance = await nftMarketplaceInstance(account);
+        const nftMarketplace_instance = await nftMarketplaceInstance(address);
         const tx = await nftMarketplace_instance!.createMarketItem(
           nftAddress,
           tokenContractAddress,

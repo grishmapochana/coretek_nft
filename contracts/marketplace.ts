@@ -4,7 +4,7 @@ import networkInfo from "./network";
 
 const contractInfo: ContractInfo = {
   name: "Marketplace",
-  address: "0x1b27aa2AE7670a4DE65F2605C3A7E2E4fCA7F006",
+  address: "0x0d287f61B3dB151b0403A634BaD66ae593fB9078",
   habi: [
     "constructor()",
     "event MarketItemCreated(uint256 indexed marketItemId, address indexed nftContract, uint256 indexed tokenId, address creator, address seller, address owner, uint256 price, bool sold, bool canceled)",

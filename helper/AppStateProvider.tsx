@@ -4,11 +4,11 @@ import network from "../contracts/network";
 import mnftInfo from "../contracts/mnft";
 import mtokenInfo from "../contracts/mtoken";
 import marketplaceInfo from "../contracts/marketplace";
-import type { MNFT} from "../contracts/types/MNFT";
-import type { MToken} from "../contracts/types/MToken";
-import type { Marketplace} from "../contracts/types/Marketplace";
+import type { MNFT } from "../contracts/types/MNFT";
+import type { MToken } from "../contracts/types/MToken";
+import type { Marketplace } from "../contracts/types/Marketplace";
 
-interface AppState {
+export interface AppState {
   provider?: ethers.providers.Web3Provider | null;
   signer?: ethers.providers.JsonRpcSigner | null;
   address?: string | null; // isMetamaskConnected
@@ -28,7 +28,11 @@ interface AppContextState {
     ethers.providers.Web3Provider | null | undefined,
     ethers.providers.JsonRpcSigner | null | undefined
   ];
-  getContracts: () => [MToken | undefined | null, MNFT | undefined | null, Marketplace | undefined | null];
+  getContracts: () => [
+    MToken | undefined | null,
+    MNFT | undefined | null,
+    Marketplace | undefined | null
+  ];
   fromWei: (num: BigNumber) => string;
   toWei: (str: string) => BigNumber;
 }
@@ -58,7 +62,7 @@ export default function AppStateProvider({ children }: { children: any }) {
   }
 
   function getAppState(): AppState {
-    return appStateRef.current;
+    return { ...appStateRef.current };
   }
 
   function resetAppState(): void {
@@ -92,7 +96,11 @@ export default function AppStateProvider({ children }: { children: any }) {
     }
   }
 
-  function getContracts() : [MToken | undefined | null, MNFT | undefined | null, Marketplace | undefined | null] {
+  function getContracts(): [
+    MToken | undefined | null,
+    MNFT | undefined | null,
+    Marketplace | undefined | null
+  ] {
     const erc20Contract = appStateRef.current.erc20Contract;
     const nftContract = appStateRef.current.nftContract;
     const marketplaceContract = appStateRef.current.marketplaceContract;
@@ -107,6 +115,10 @@ export default function AppStateProvider({ children }: { children: any }) {
       let [provider, signer] = getProviderNSigner();
       if (provider && signer) {
         const signerAddress = await signer.getAddress();
+        if (!appStateRef.current.address && signerAddress) {
+          updateAppState({ address: signerAddress });
+          setupContracts();
+        }
         console.log({
           msg: `already connected, signer address is ${signerAddress}`,
         });
@@ -132,6 +144,12 @@ export default function AppStateProvider({ children }: { children: any }) {
       if (address) {
         updateAppState({ address });
         setupContracts();
+      } else {
+        console.log(
+          "connectMetamask",
+          "some thing went wrong - address & smartcontracts not setup",
+          { address }
+        );
       }
     } catch (err: any) {
       console.log(err.code, err.message);
@@ -154,6 +172,12 @@ export default function AppStateProvider({ children }: { children: any }) {
     if (address) {
       updateAppState({ address });
       setupContracts();
+    } else {
+      console.log(
+        "reconnectMetamask",
+        "some thing went wrong - address & smartcontracts not setup",
+        { address }
+      );
     }
   }
 

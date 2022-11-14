@@ -1,14 +1,17 @@
 import React from "react";
-import { useWeb3React } from "@web3-react/core";
 import { getFormatedNft, nftInstance } from "../helper/web3function";
 import { shortenAddress } from "../helper";
 import Link from "next/link";
-import NftCard from "../components/nftCard";
+import { useAppState } from "../helper/AppStateProvider";
 
 declare let window: any;
 
 export default function Collected() {
-  const { account } = useWeb3React();
+
+  const { getAppState } = useAppState();
+  const { address } = getAppState();
+  const account = address;
+  
   const [nftData, setNftData] = React.useState<{ [key: string]: any }>([]);
 
   React.useEffect(() => {

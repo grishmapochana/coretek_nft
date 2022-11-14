@@ -113,7 +113,6 @@ export default function AppStateProvider({ children }: { children: any }) {
   async function connectMetamask() {
     try {
       let [provider, signer] = getProviderNSigner();
-      console.log({ provider, signer });
       if (provider && signer) {
         const signerAddress = await signer.getAddress();
         if (!appStateRef.current.address && signerAddress) {
@@ -122,8 +121,7 @@ export default function AppStateProvider({ children }: { children: any }) {
         }
         console.log({
           msg: `already connected, signer address is ${signerAddress}`,
-        }, getContracts());
-
+        });
         return;
       }
 

@@ -2,10 +2,10 @@ import React from "react";
 import {
   nftInstance
 } from "../helper/web3function";
-import { useWeb3React } from "@web3-react/core";
 import "react-toastify/dist/ReactToastify.css";
 import { toast, ToastContainer } from "react-toastify";
 import { createJSONFile, uploadFile } from "../helper/file-ipfs";
+import { useAppState } from "../helper/AppStateProvider";
 
 const initialState = {
   name: "",
@@ -25,7 +25,11 @@ interface InitialState {
 declare let window: any;
 
 export default function Mint() {
-  const { account, active } = useWeb3React();
+
+  const { getAppState } = useAppState();
+  const { address } = getAppState();
+  const account = address;
+  
   const formRef = React.useRef(null);
   const [attributes, setAttributes] = React.useState<any>(null);
 
@@ -85,14 +89,13 @@ export default function Mint() {
     const file = createJSONFile(reqObj, name);
     const uri = await uploadFile(file!);
     console.log("📌 👉 👨‍💻 handleMint 👨‍💻 uri", uri);
-    return;
     // const metaData = JSON.stringify(reqObj);
 
     // const uri = await Client.add(metaData);
     // const url = `https://coretek-nft.infura-ipfs.io/ipfs/${uri.path}`;
 
 
-    if (window.ethereum && active) {
+    if (window.ethereum && account) {
       const nft_instance = await nftInstance(account);
       const tx = await nft_instance!.mintToken(uri);
       await tx.wait();

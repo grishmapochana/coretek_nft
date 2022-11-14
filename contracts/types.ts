@@ -6,8 +6,8 @@ export interface NetworkInfo {
 }
 
 export interface ContractInfo {
-    name: string,
-    address: string,
-    habi: string | string[],
-    network: NetworkInfo
+  name: string,
+  address: string,
+  habi: string | string[],
+  network: NetworkInfo
 }

@@ -1,3 +1,4 @@
+
 import { ethers } from "ethers";
 import fs from "fs";
 import { fromWei, deployNGetContract, getAccounts } from "./deploy";
@@ -5,16 +6,12 @@ import { getHABIfromContract, getJABIfromContract } from "./abi";
 import hardhatconfig from "../hardhat.config";
 
 interface NetworkInfo {
-  name?: string | undefined | null;
-  chainId?: number | undefined;
-  url?: string | null | undefined;
+  name?: string | undefined | null,
+  chainId?: number | undefined,
+  url?: string | null | undefined
 }
 
-function formatContractInfo(
-  name: string,
-  address: string,
-  habi: string | string[]
-): string {
+function formatContractInfo(name: string, address: string, habi: string | string[]): string {
   return `
 import { ContractInfo } from "./types";
 import networkInfo from "./network";  
@@ -27,14 +24,14 @@ const contractInfo: ContractInfo = {
 }
 
 export default contractInfo;
-`;
+`
 }
 
-function getDeployedNetworkInfo(): NetworkInfo {
+function getDeployedNetworkInfo() : NetworkInfo{
   const networkInfo: NetworkInfo = {};
   const networkName = process.env.HH_NTWK;
   networkInfo.name = networkName;
-  if (networkName && hardhatconfig && hardhatconfig.networks) {
+  if(networkName && hardhatconfig && hardhatconfig.networks) {
     const info = hardhatconfig.networks[networkName];
     networkInfo.chainId = info?.chainId;
     networkInfo.url = (info as any)?.url;
@@ -51,12 +48,12 @@ export interface NetworkInfo {
 }
 
 export interface ContractInfo {
-    name: string,
-    address: string,
-    habi: string | string[],
-    network: NetworkInfo
+  name: string,
+  address: string,
+  habi: string | string[],
+  network: NetworkInfo
 }
-`;
+`
   fs.writeFileSync(`contracts/types.ts`, fmtString);
 }
 
@@ -66,11 +63,41 @@ import { NetworkInfo } from "./types";
 
 const networkInfo: NetworkInfo = {
   name: ${networkInfo?.name ? `"${networkInfo?.name}"` : null},
-  chainId: ${networkInfo?.chainId ? `"${networkInfo?.chainId}"` : undefined},
+  chainId: ${networkInfo?.chainId ? `${networkInfo.chainId}` : undefined},
   url: ${networkInfo?.url ? `"${networkInfo?.url}"` : null}
 };
 
-export default networkInfo;`;
+export function getAddressUrl(address: string): string {
+  let { name } = networkInfo;
+  if (!name) return "#";
+  if (name.includes("localhost")) {
+    return "http://127.0.0.1:8545/address/" + address;
+  }
+  if (name.includes("bsc_testnet")) {
+    return "https://testnet.bscscan.com/address/" + address;
+  }
+  if (name.includes("bsc_mainnet")) {
+    return "https://bscscan.com/address/" + address;
+  }
+  return "#";
+}
+
+export function getTxUrl(txHash: string): string {
+  let { name } = networkInfo;
+  if (!name) return "#";
+  if (name.includes("localhost")) {
+    return "http://127.0.0.1:8545/address/" + txHash;
+  }
+  if (name.includes("bsc_testnet")) {
+    return "https://testnet.bscscan.com/address/" + txHash;
+  }
+  if (name.includes("bsc_mainnet")) {
+    return "https://bscscan.com/address/" + txHash;
+  }
+  return "#";
+}
+
+export default networkInfo;`
 
   fs.writeFileSync(`contracts/network.ts`, fmtString);
 }
@@ -78,36 +105,36 @@ export default networkInfo;`;
 function writeAbis(contract: ethers.Contract, contractName: string) {
   const address = contract.address;
   const habi = getHABIfromContract(contract);
-  fs.writeFileSync(
-    `contracts/${contractName.toLowerCase()}.ts`,
-    formatContractInfo(contractName, address, habi)
-  );
+  fs.writeFileSync(`contracts/${contractName.toLowerCase()}.ts`, formatContractInfo(contractName, address, habi));
   const jabi = getJABIfromContract(contract);
   fs.writeFileSync(`contracts/abis/${contractName}.json`, `${jabi}`);
 }
 
 async function main() {
+
   const [owner] = await getAccounts();
 
-  const MTOKEN = "MToken";
-  const MARKETPLACE = "Marketplace";
-  const MNFT = "MNFT";
+  const MTOKEN = 'MToken';
+  const MARKETPLACE = 'Marketplace';
+  const MNFT = 'MNFT';
 
   const erc20Contract = await deployNGetContract(MTOKEN);
   const marketplaceContract = await deployNGetContract(MARKETPLACE);
-  const nftContract = await deployNGetContract(
-    MNFT,
-    marketplaceContract.address
-  );
+  const nftContract = await deployNGetContract(MNFT, marketplaceContract.address);
 
   writeTypesinfo();
 
   const network = getDeployedNetworkInfo();
+  // if(network.chainId == 31337) {
+  //   network.chainId = 1337;
+  // }
   writeNetworkInfo(network);
 
   writeAbis(erc20Contract, MTOKEN);
   writeAbis(marketplaceContract, MARKETPLACE);
   writeAbis(nftContract, MNFT);
+
+  // const { erc20Contract, nftContract, marketplaceContract, owner } = await deployContractsAndGetAccounts();
 
   const mtk = fromWei(await erc20Contract.balanceOf(owner.address));
   const eth = fromWei(await owner.getBalance());
@@ -119,6 +146,7 @@ async function main() {
   const deployInfo = {
     datetime: dt.toLocaleString(),
     network,
+    // datetime: [dt.getFullYear(), dt.getMonth() + 1, dt.getDate()].join("_"),
     erc20ContractAddr: erc20Contract.address,
     nftContractAddr: nftContract.address,
     marketplaceContractAddr: marketplaceContract.address,
@@ -127,23 +155,17 @@ async function main() {
       address: owner.address,
       balance: {
         mtk,
-        eth,
-      },
-    },
+        eth
+      }
+    }
   };
 
-  fs.writeFileSync(
-    `contracts/deployment-info.txt`,
-    "\n\n" + JSON.stringify(deployInfo, null, 2) + "\n\n"
-  );
-  fs.writeFileSync(
-    `deployment-info.txt`,
-    JSON.stringify(deployInfo, null, 2) +
-      "\n\n======================================\n\n",
-    { flag: "a" }
-  );
+  // fs.writeFileSync(`habis/deployment-info.txt`, "\n\n" + JSON.stringify(deployInfo, null, 2) + "\n\n");
+  fs.writeFileSync(`contracts/deployment-info.txt`, "\n\n" + JSON.stringify(deployInfo, null, 2) + "\n\n");
+  fs.writeFileSync(`deployment-info.txt`, JSON.stringify(deployInfo, null, 2) + "\n\n======================================\n\n", { flag: 'a' })
   console.log(deployInfo);
 }
+
 
 main().catch((error) => {
   console.error(error);

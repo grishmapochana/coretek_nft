@@ -3,173 +3,211 @@ import { expect } from "chai";
 import { BigNumber } from "ethers";
 import { deployContractsAndGetAccounts } from "../scripts/deploy";
 
-describe("MNFT", function () {
-  it("increases token's id after each mint", async function () {
-    const { nftContract, marketplaceContract } = await loadFixture(
-      deployContractsAndGetAccounts
-    );
-    await expect(nftContract.mintToken(""))
-      .to.emit(nftContract, "TokenMinted")
-      .withArgs(1, "", marketplaceContract.address);
+describe('MNFT', function () {
 
-    await expect(nftContract.mintToken(""))
-      .to.emit(nftContract, "TokenMinted")
-      .withArgs(2, "", marketplaceContract.address);
-  });
+    it("increases token's id after each mint", async function () {
+        const { nftContract, marketplaceContract } = await loadFixture(deployContractsAndGetAccounts);
+        await expect(nftContract.mintToken(''))
+            .to.emit(nftContract, 'TokenMinted')
+            .withArgs(1, '', marketplaceContract.address)
 
-  it("gets token ids owned by msg.sender", async function () {
-    const { nftContract, owner, acc1 } = await loadFixture(
-      deployContractsAndGetAccounts
-    );
-    await nftContract.mintToken("");
-    await nftContract.connect(acc1).mintToken("");
-    await nftContract.mintToken("");
-    await nftContract.transferFrom(owner.address, acc1.address, 1);
+        await expect(nftContract.mintToken(''))
+            .to.emit(nftContract, 'TokenMinted')
+            .withArgs(2, '', marketplaceContract.address)
+    })
 
-    const nftIds = await nftContract.getTokensOwnedByMe();
+    it('gets token ids owned by msg.sender', async function () {
+        const { nftContract, owner, acc1 } = await loadFixture(deployContractsAndGetAccounts);
+        await nftContract.mintToken('')
+        await nftContract.connect(acc1).mintToken('')
+        await nftContract.mintToken('')
+        await nftContract.transferFrom(owner.address, acc1.address, 1)
 
-    expect(nftIds).to.have.length(1);
+        const nftIds = await nftContract.getTokensOwnedByMe()
 
-    expect(nftIds).to.eql([BigNumber.from(3)]);
-  });
+        expect(nftIds).to.have.length(1)
 
-  it("gets token ids created by msg.sender", async function () {
-    const { nftContract, acc1 } = await loadFixture(
-      deployContractsAndGetAccounts
-    );
-    await nftContract.mintToken("");
-    await nftContract.connect(acc1).mintToken("");
-    await nftContract.mintToken("");
+        expect(nftIds).to.eql([
+            BigNumber.from(3)
+        ])
+    })
 
-    const nftIds = await nftContract.getTokensCreatedByMe();
+    it('gets token ids created by msg.sender', async function () {
+        const { nftContract, acc1 } = await loadFixture(deployContractsAndGetAccounts);
+        await nftContract.mintToken('')
+        await nftContract.connect(acc1).mintToken('')
+        await nftContract.mintToken('')
 
-    expect(nftIds).to.have.length(2);
+        const nftIds = await nftContract.getTokensCreatedByMe()
 
-    expect(nftIds).to.eql([BigNumber.from(1), BigNumber.from(3)]);
-  });
+        expect(nftIds).to.have.length(2)
 
-  it("gets token creator by id", async function () {
-    const { nftContract, owner } = await loadFixture(
-      deployContractsAndGetAccounts
-    );
-    await nftContract.mintToken("");
-    const creator = await nftContract.getTokenCreatorById(1);
-    expect(creator).to.eql(owner.address);
-  });
+        expect(nftIds).to.eql([
+            BigNumber.from(1),
+            BigNumber.from(3)
+        ])
+    })
 
-  it("get all tokens created", async function () {
-    const { nftContract, owner, acc1, acc2 } = await loadFixture(
-      deployContractsAndGetAccounts
-    );
-    await nftContract.mintToken("");
-    await nftContract.connect(acc1).mintToken("");
-    await nftContract.connect(acc2).mintToken("");
-    await nftContract.connect(owner).mintToken("");
-    await nftContract.connect(acc1).mintToken("");
-    await nftContract.connect(acc2).mintToken("");
+    it('gets token creator by id', async function () {
+        const { nftContract, owner } = await loadFixture(deployContractsAndGetAccounts);
+        await nftContract.mintToken('')
+        const creator = await nftContract.getTokenCreatorById(1)
+        expect(creator).to.eql(owner.address)
+    })
 
-    const allNftIds = await nftContract.getAllTokens();
+    it("get all tokens created", async function () {
+        const { nftContract, owner, acc1, acc2 } = await loadFixture(deployContractsAndGetAccounts);
+        await nftContract.mintToken('')
+        await nftContract.connect(acc1).mintToken('')
+        await nftContract.connect(acc2).mintToken('')
+        await nftContract.connect(owner).mintToken('')
+        await nftContract.connect(acc1).mintToken('')
+        await nftContract.connect(acc2).mintToken('')
 
-    expect(allNftIds).to.have.length(6);
+        const allNftIds = await nftContract.getAllTokens()
 
-    expect(allNftIds).to.eql([
-      BigNumber.from(1),
-      BigNumber.from(2),
-      BigNumber.from(3),
-      BigNumber.from(4),
-      BigNumber.from(5),
-      BigNumber.from(6),
-    ]);
-  });
+        expect(allNftIds).to.have.length(6)
 
-  it("get Latest token", async function () {
-    const { nftContract } = await loadFixture(deployContractsAndGetAccounts);
-    await nftContract.mintToken("");
-    await nftContract.mintToken("");
-    await nftContract.mintToken("");
-    await nftContract.mintToken("");
-    await nftContract.mintToken("");
+        expect(allNftIds).to.eql([
+            BigNumber.from(1),
+            BigNumber.from(2),
+            BigNumber.from(3),
+            BigNumber.from(4),
+            BigNumber.from(5),
+            BigNumber.from(6),
+        ])
+    });
 
-    const latestTokenId = await nftContract.getLatestToken();
+    it("get Latest token", async function () {
+        const { nftContract } = await loadFixture(deployContractsAndGetAccounts);
+        await nftContract.mintToken('')
+        await nftContract.mintToken('')
+        await nftContract.mintToken('')
+        await nftContract.mintToken('')
+        await nftContract.mintToken('')
 
-    expect(latestTokenId).to.eql(BigNumber.from(5));
-  });
+        const latestTokenId = await nftContract.getLatestToken()
 
-  it("token transfer", async function () {
-    const { nftContract, owner, acc1, acc2 } = await loadFixture(
-      deployContractsAndGetAccounts
-    );
+        expect(latestTokenId).to.eql(BigNumber.from(5))
+    })
 
-    await nftContract.mintToken("1");
-    await nftContract.transferFrom(owner.address, acc1.address, 1);
+    it("token transfer", async function () {
+        const { nftContract, owner, acc1, acc2 } = await loadFixture(deployContractsAndGetAccounts);
 
-    await nftContract.mintToken("2");
-    let tokenOwner = await nftContract.ownerOf(1);
-    expect(tokenOwner).to.eql(acc1.address);
+        await nftContract.mintToken('1')
+        await nftContract.transferFrom(owner.address, acc1.address, 1);
 
-    await nftContract.connect(acc1).transferFrom(acc1.address, acc2.address, 1);
-    tokenOwner = await nftContract.ownerOf(1);
-    expect(tokenOwner).to.eql(acc2.address);
+        await nftContract.mintToken('2')
+        let tokenOwner = await nftContract.ownerOf(1);
+        expect(tokenOwner).to.eql(acc1.address);
 
-    await nftContract
-      .connect(acc2)
-      .transferFrom(acc2.address, owner.address, 1);
-    tokenOwner = await nftContract.ownerOf(1);
-    expect(tokenOwner).to.eql(owner.address);
+        await nftContract.connect(acc1).transferFrom(acc1.address, acc2.address, 1)
+        tokenOwner = await nftContract.ownerOf(1)
+        expect(tokenOwner).to.eql(acc2.address)
 
-    // const tokensCreatedByMe = await nftContract.connect(acc2).getTokensCreatedByMe()
-    // console.log(tokensCreatedByMe)
+        await nftContract.connect(acc2).transferFrom(acc2.address, owner.address, 1)
+        tokenOwner = await nftContract.ownerOf(1)
+        expect(tokenOwner).to.eql(owner.address)
 
-    // const tokensOwnedByMe = await nftContract.connect(acc2).getTokensOwnedByMe()
-    // console.log(tokensOwnedByMe)
-  });
+        // const tokensCreatedByMe = await nftContract.connect(acc2).getTokensCreatedByMe()
+        // console.log(tokensCreatedByMe)
 
-  it("get all tokens & getAllTokensOwnedBy", async function () {
-    const { nftContract, owner, acc1, acc2 } = await loadFixture(
-      deployContractsAndGetAccounts
-    );
-    await nftContract.mintToken("1");
-    await nftContract.connect(acc1).mintToken("2");
-    await nftContract.connect(acc2).mintToken("3");
-    await nftContract.connect(owner).mintToken("4");
-    await nftContract.connect(acc1).mintToken("5");
-    await nftContract.connect(acc2).mintToken("6");
-    await nftContract.mintToken("7");
+        // const tokensOwnedByMe = await nftContract.connect(acc2).getTokensOwnedByMe()
+        // console.log(tokensOwnedByMe)
+    })
 
-    const allTokens = await nftContract.getAllTokens();
-    expect(allTokens).to.eql([
-      BigNumber.from(1),
-      BigNumber.from(2),
-      BigNumber.from(3),
-      BigNumber.from(4),
-      BigNumber.from(5),
-      BigNumber.from(6),
-      BigNumber.from(7),
-    ]);
+    it("get all tokens & getAllTokensOwnedBy", async function () {
+        const { nftContract, owner, acc1, acc2 } = await loadFixture(deployContractsAndGetAccounts);
+        await nftContract.mintToken('1')
+        await nftContract.connect(acc1).mintToken('2')
+        await nftContract.connect(acc2).mintToken('3')
+        await nftContract.connect(owner).mintToken('4')
+        await nftContract.connect(acc1).mintToken('5')
+        await nftContract.connect(acc2).mintToken('6')
+        await nftContract.mintToken('7')
 
-    const allTokensOwnedByOwner = await nftContract.getAllTokensOwnedBy(
-      owner.address
-    );
-    expect(allTokensOwnedByOwner).to.eql([
-      BigNumber.from(1),
-      BigNumber.from(4),
-      BigNumber.from(7),
-    ]);
-    const noOfTokensOwnedByOwner = await nftContract.balanceOf(owner.address);
-    expect(noOfTokensOwnedByOwner).to.eql(BigNumber.from(3));
+        const allTokens = await nftContract.getAllTokens()
+        expect(allTokens).to.eql([
+            BigNumber.from(1),
+            BigNumber.from(2),
+            BigNumber.from(3),
+            BigNumber.from(4),
+            BigNumber.from(5),
+            BigNumber.from(6),
+            BigNumber.from(7),
+        ])
 
-    const allTokensOwnedByAcc1 = await nftContract.getAllTokensOwnedBy(
-      acc1.address
-    );
-    expect(allTokensOwnedByAcc1).to.eql([BigNumber.from(2), BigNumber.from(5)]);
-    const noOfTokensOwnedByAcc1 = await nftContract.balanceOf(acc1.address);
-    expect(noOfTokensOwnedByAcc1).to.eql(BigNumber.from(2));
+        const allTokensOwnedByOwner = await nftContract.getAllTokensOwnedBy(owner.address)
+        expect(allTokensOwnedByOwner).to.eql([
+            BigNumber.from(1),
+            BigNumber.from(4),
+            BigNumber.from(7),
+        ])
+        const noOfTokensOwnedByOwner = await nftContract.balanceOf(owner.address)
+        expect(noOfTokensOwnedByOwner).to.eql(BigNumber.from(3))
 
-    const allTokensOwnedByAcc2 = await nftContract.getAllTokensOwnedBy(
-      acc2.address
-    );
-    expect(allTokensOwnedByAcc2).to.eql([BigNumber.from(3), BigNumber.from(6)]);
-    const noOfTokensOwnedByAcc2 = await nftContract.balanceOf(acc2.address);
-    expect(noOfTokensOwnedByAcc2).to.eql(BigNumber.from(2));
-  });
-});
+        const allTokensOwnedByAcc1 = await nftContract.getAllTokensOwnedBy(acc1.address)
+        expect(allTokensOwnedByAcc1).to.eql([
+            BigNumber.from(2),
+            BigNumber.from(5),
+        ])
+        const noOfTokensOwnedByAcc1 = await nftContract.balanceOf(acc1.address)
+        expect(noOfTokensOwnedByAcc1).to.eql(BigNumber.from(2))
+
+        const allTokensOwnedByAcc2 = await nftContract.getAllTokensOwnedBy(acc2.address)
+        expect(allTokensOwnedByAcc2).to.eql([
+            BigNumber.from(3),
+            BigNumber.from(6),
+        ])
+        const noOfTokensOwnedByAcc2 = await nftContract.balanceOf(acc2.address)
+        expect(noOfTokensOwnedByAcc2).to.eql(BigNumber.from(2))
+    })
+
+    it("getAllTokenInfos & getAllTokenInfosOwnedBy & getAllTokenInfosOwnedByMe", async function () {
+        const { nftContract, owner, acc1, acc2 } = await loadFixture(deployContractsAndGetAccounts);
+        await nftContract.mintToken('1')
+        await nftContract.connect(acc1).mintToken('2')
+        await nftContract.connect(acc2).mintToken('3')
+        await nftContract.connect(owner).mintToken('4')
+        await nftContract.connect(acc1).mintToken('5')
+        await nftContract.connect(acc2).mintToken('6')
+        await nftContract.mintToken('7')
+
+        const allTokenInfos = await nftContract.getAllTokenInfos()
+        // console.log(allTokenInfos.map((token: any) => [token.tokenId.toNumber(), token.owner]))
+        expect(allTokenInfos.map((token: any) => [token.tokenId, token.owner])).to.eql([
+            [BigNumber.from(1), owner.address],
+            [BigNumber.from(2), acc1.address],
+            [BigNumber.from(3), acc2.address],
+            [BigNumber.from(4), owner.address],
+            [BigNumber.from(5), acc1.address],
+            [BigNumber.from(6), acc2.address],
+            [BigNumber.from(7), owner.address],
+        ])
+
+        const allTokenInfosOwnedByOwner = await nftContract.getAllTokenInfosOwnedBy(owner.address)
+        expect(allTokenInfosOwnedByOwner.map((token: any) => [token.tokenId, token.owner])).to.eql([
+            [BigNumber.from(1), owner.address],
+            [BigNumber.from(4), owner.address],
+            [BigNumber.from(7), owner.address],
+        ])
+        // const noOfTokensOwnedByOwner = await nftContract.balanceOf(owner.address)
+        // expect(noOfTokensOwnedByOwner).to.eql(BigNumber.from(3))
+
+        const allTokenInfosOwnedByAcc1 = await nftContract.connect(acc1).getAllTokenInfosOwnedByMe()
+        expect(allTokenInfosOwnedByAcc1.map((token: any) => [token.tokenId, token.owner])).to.eql([
+            [BigNumber.from(2), acc1.address],
+            [BigNumber.from(5), acc1.address],
+        ])
+        // const noOfTokensOwnedByAcc1 = await nftContract.balanceOf(acc1.address)
+        // expect(noOfTokensOwnedByAcc1).to.eql(BigNumber.from(2))
+
+        // const allTokensOwnedByAcc2 = await nftContract.getAllTokensOwnedBy(acc2.address)
+        // expect(allTokensOwnedByAcc2).to.eql([
+        //     BigNumber.from(3),
+        //     BigNumber.from(6),
+        // ])
+        // const noOfTokensOwnedByAcc2 = await nftContract.balanceOf(acc2.address)
+        // expect(noOfTokensOwnedByAcc2).to.eql(BigNumber.from(2))
+    })
+})
