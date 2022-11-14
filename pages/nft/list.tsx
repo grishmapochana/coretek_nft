@@ -6,7 +6,7 @@ import Router from "next/router";
 import TransferFormModal from "../../components/Modal";
 
 export default function MintedNFTs({ address }: { address?: string }) {
-  const { getContracts, getAppState } = useAppState();
+  const { getAppState } = useAppState();
   const [loading, setLoading] = useState(false);
   const [nfts, setNfts] = React.useState<{ [key: string]: any }>([]);
   const [showModal, setShowModal] = useState(false);
@@ -17,14 +17,13 @@ export default function MintedNFTs({ address }: { address?: string }) {
     getMyNFTs();
   }, []);
 
-  const _getMintedNFTs = async (address?: string) => {
+  const _getMintedNFTs = async (addr?: string) => {
     try {
       setLoading(true);
-      const appState = getAppState();
-      const { nftContract } = appState;
-      if (nftContract && appState.address) {
+      const {address, nftContract} = getAppState();
+      if (nftContract && addr && address) {
         let mintedTokens: { tokenId: number; owner: string }[] = [];
-        if (!address) {
+        if (!addr) {
           const allTokenInfos = await nftContract.getAllTokenInfos();
           mintedTokens = allTokenInfos.map((ti: any) => ({
             tokenId: ti.tokenId,
@@ -46,7 +45,7 @@ export default function MintedNFTs({ address }: { address?: string }) {
               let tokenUri: string = await nftContract.tokenURI(tokenId);
               let nftData = await getJSONMetadataBy(tokenUri);
               nftData.owner = owner;
-              nftData.address = appState.address;
+              nftData.address = address;
               nftData.tokenId = tokenId;
               return nftData;
             })

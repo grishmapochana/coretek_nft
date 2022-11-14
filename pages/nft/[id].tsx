@@ -25,7 +25,8 @@ export default function Page() {
   });
   const [loading, setLoading] = useState(false);
 
-  const { getContracts, getProviderNSigner } = useAppState();
+  // const { getContracts, getProviderNSigner } = useAppState();
+  const {getAppState} = useAppState();
 
   useEffect(() => {
     if (id) getNFT();
@@ -34,8 +35,9 @@ export default function Page() {
   const getNFT = async () => {
     try {
       setLoading(true);
-      const [erc20Contract, nftContract, marketplaceContract] = getContracts();
-      const [_, signer] = getProviderNSigner();
+      const {erc20Contract, nftContract, marketplaceContract, signer} = getAppState();
+      // const [erc20Contract, nftContract, marketplaceContract] = getContracts();
+      // const [_, signer] = getProviderNSigner();
       if (erc20Contract && nftContract && marketplaceContract && signer && id) {
         let tokenId = parseInt(id as string);
         let tokenUri = await nftContract.tokenURI(tokenId);

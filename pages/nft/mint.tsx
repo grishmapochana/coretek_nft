@@ -35,7 +35,8 @@ export default function CreateNFT() {
   const [formData, setFormData] = useState<InitialState>(initState);
   const [loading, setLoading] = useState(false);
 
-  const { getContracts, getProviderNSigner, getAppState } = useAppState();
+  const { getAppState } = useAppState();
+  
 
   const handleChange = (e: any) => {
     const { name, value } = e.target;
@@ -70,9 +71,7 @@ export default function CreateNFT() {
   };
 
   async function mint(payload: InitialState, file: File) {
-    const [erc20Contract, nftContract, marketplaceContract] = getContracts();
-    const [_, signer] = getProviderNSigner();
-
+    const {erc20Contract, nftContract, marketplaceContract,signer} = getAppState();
     const assetFile = file;
     const assetFileName = assetFile.name;
     const assetUrl = await uploadFile(assetFile, assetFileName, "vj");
