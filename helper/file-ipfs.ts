@@ -1,5 +1,5 @@
 const BASE_URL: string = "http://52.52.130.184:9999";
-import Client from "../helper/ipfs";
+import Client from "./ipfs";
 
 export async function uploadFile(
   file: File,

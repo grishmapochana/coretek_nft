@@ -1,24 +1,61 @@
-import React, { Component, ReactNode } from "react";
-import Header from "./header";
-import { Web3ReactProvider } from "@web3-react/core";
-import Web3 from "web3";
+import { stat } from "fs";
+import { ReactNode, useCallback, useState } from "react";
+import Header from "../components/header";
+import { useAppState } from "../provider/AppStateProvider";
 
-interface Props {
-    children?: ReactNode
-    // any props that come into the component
-}
+export default function Layout({ children }: { children?: ReactNode }) {
+  const {
+    getContracts,
+    getAppState,
+    fromWei,
+    connectMetamask,
+    reconnectMetamask,
+    disconnectMetamask,
+  } = useAppState();
+  const [state, setState] = useState<{
+    balances: { name: string; symbol: string; value: string }[];
+    address?: string;
+  }>({ balances: [] });
 
-function getLibrary(provider: any) {
-  return new Web3(provider);
-}
+  async function getOrUpdateState() {
+    const appst = getAppState();
+    const [erc20Contract, nftContract, marketplaceContract] = getContracts();
+    console.log("Hi")
+    if (appst.address && erc20Contract && nftContract && marketplaceContract) {
+      let name = await erc20Contract.name();
+      let symbol = await erc20Contract.symbol();
+      let balInWei = await erc20Contract.balanceOf(appst.address);
+      setState({
+        address: appst.address,
+        balances: [{ name, symbol, value: fromWei(balInWei) }],
+      });
+    }
+  }
 
-export default function Layout({children}: Props) {
+  const connect = useCallback(async () => {
+    await connectMetamask();
+    await getOrUpdateState();
+  }, []);
+
+  const reconnect = useCallback(async () => {
+    await reconnectMetamask();
+    await getOrUpdateState();
+  }, []);
+
+  const disconnect = useCallback(async () => {
+    await disconnectMetamask(); // internally resets appstate
+    await getOrUpdateState();
+  }, []);
+
   return (
-    <Web3ReactProvider getLibrary={getLibrary}>
     <div>
-        <Header />
-        {children}
+      <Header
+        state={state}
+        connect={connect}
+        reconnect={reconnect}
+        disconnect={disconnect}
+      />
+      {state.address ? children : <div className="m-20">please connect metamask</div>}
     </div>
-</Web3ReactProvider>
   );
-  };
+}

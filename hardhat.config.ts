@@ -1,29 +1,60 @@
 import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
-import "@nomiclabs/hardhat-etherscan";
+import { mnemonic } from "./secrets";
 
-const metaMaskPrivateKey =
-  "d815657879410bbbc004d275343d9e1d12b0798682d1f2c7f0f5136f68092d01";
 const config: HardhatUserConfig = {
-  solidity: "0.8.17",
   networks: {
-    hardhat: {
-      chainId: 31337,
+    localhost: {
+      url: "http://127.0.0.1:8545",
+      // chainId: 1337,
     },
-    goerli: {
-      url: "https://goerli.infura.io/v3/6648f6b6ccf04296b0496cac0d1b2a00",
-      accounts: [metaMaskPrivateKey],
-    },
-    bsc_testnet: {
+    hardhat: {},
+    bsc_testnet_s1_1: {
       url: "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
       gasPrice: 20000000000,
-      accounts: [metaMaskPrivateKey],
-      // accounts: {mnemonic},
+      accounts: { mnemonic },
+    },
+    bsc_testnet_s1_2: {
+      url: "https://data-seed-prebsc-2-s1.binance.org:8545/",
+      chainId: 97,
+      gasPrice: 20000000000,
+      accounts: { mnemonic },
+    },
+    bsc_testnet_s2_2: {
+      url: "https://data-seed-prebsc-1-s1.binance.org:8545",
+      chainId: 97,
+      gasPrice: 20000000000,
+      accounts: { mnemonic },
+    },
+    bsc_mainnet: {
+      url: "https://bsc-dataseed.binance.org/",
+      chainId: 56,
+      gasPrice: 20000000000,
+      // accounts: {mnemonic: mnemonic}
     },
   },
-  etherscan: {
-    apiKey: "asdadasd",
+  solidity: {
+    version: "0.8.17",
+    settings: {
+      optimizer: {
+        enabled: true,
+      },
+    },
+  },
+  paths: {
+    sources: "./sols",
+    tests: "./test",
+    cache: "./cache",
+    artifacts: "./artifacts",
+  },
+  gasReporter: {
+    enabled: true,
+    // outputFile: 'gas-report.txt',
+    // noColors: true
+  },
+  mocha: {
+    timeout: 20000,
   },
 };
 

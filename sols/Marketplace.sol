@@ -2,8 +2,8 @@
 pragma solidity ^0.8.9;
 
 import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import "./NFT.sol";
-import "./MAC.sol";
+import "./MNFT.sol";
+import "./MToken.sol";
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 // import "hardhat/console.sol";
@@ -66,7 +66,7 @@ contract Marketplace is ReentrancyGuard {
         _marketItemIds.increment();
         uint256 marketItemId = _marketItemIds.current();
 
-        address creator = NFT(nftContractAddress).getTokenCreatorById(tokenId);
+        address creator = MNFT(nftContractAddress).getTokenCreatorById(tokenId);
 
         marketItemIdToMarketItem[marketItemId] = MarketItem(
             marketItemId,
@@ -80,7 +80,7 @@ contract Marketplace is ReentrancyGuard {
             false
         );
 
-        MAC(erc20ContractAddress).transferFrom(msg.sender, address(this), listingFee);
+        MToken(erc20ContractAddress).transferFrom(msg.sender, address(this), listingFee);
         IERC721(nftContractAddress).transferFrom(msg.sender, address(this), tokenId);
 
         emit MarketItemCreated(
@@ -112,7 +112,6 @@ contract Marketplace is ReentrancyGuard {
         _tokensCanceled.increment();
     }
 
-
     function getLatestMarketItemByTokenId(uint256 tokenId) public view returns (MarketItem memory, bool) {
         uint256 itemsCount = _marketItemIds.current();
 
@@ -126,7 +125,6 @@ contract Marketplace is ReentrancyGuard {
         return (emptyMarketItem, false);
     }
 
-
     function createMarketSale(
         address nftContractAddress,
         address erc20ContractAddress,
@@ -138,14 +136,16 @@ contract Marketplace is ReentrancyGuard {
         marketItemIdToMarketItem[marketItemId].owner = payable(msg.sender);
         marketItemIdToMarketItem[marketItemId].sold = true;
 
-        MAC(erc20ContractAddress).transferFrom(msg.sender, marketItemIdToMarketItem[marketItemId].seller, price);
+        MToken(erc20ContractAddress).transferFrom(msg.sender, marketItemIdToMarketItem[marketItemId].seller, price);
         IERC721(nftContractAddress).transferFrom(address(this), msg.sender, tokenId);
         _tokensSold.increment();
-        MAC(erc20ContractAddress).transfer(owner, listingFee);
+
+        MToken(erc20ContractAddress).transfer(owner, listingFee);
     }
 
 
     function fetchAvailableMarketItems() public view returns (MarketItem[] memory) {
+        // console.log("------------fetchAvailableMarketItems------------");
         uint256 itemsCount = _marketItemIds.current();
         uint256 soldItemsCount = _tokensSold.current();
         uint256 canceledItemsCount = _tokensCanceled.current();
@@ -179,10 +179,10 @@ contract Marketplace is ReentrancyGuard {
         return compareStrings(property, "seller") ? item.seller : item.owner;
     }
 
-
     function fetchSellingMarketItems() public view returns (MarketItem[] memory) {
         return fetchMarketItemsByAddressProperty("seller");
     }
+
 
     function fetchOwnedMarketItems() public view returns (MarketItem[] memory) {
         return fetchMarketItemsByAddressProperty("owner");

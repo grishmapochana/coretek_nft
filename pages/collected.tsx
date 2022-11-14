@@ -3,6 +3,7 @@ import { useWeb3React } from "@web3-react/core";
 import { getFormatedNft, nftInstance } from "../helper/web3function";
 import { shortenAddress } from "../helper";
 import Link from "next/link";
+import NftCard from "../components/nftCard";
 
 declare let window: any;
 
@@ -39,6 +40,7 @@ export default function Collected() {
     <div className="p-20 bg-gray-100 min-h-screen">
       <div className="m-2 text-5xl text-center">NFT Owned by the {account && shortenAddress(account)}</div>
       <div className="grid grid-cols-5 gap-6 my-10">
+        
         {nftData.map((item: any, index: number) => {
           return (
             <Link href={`/nft/${item.token}`} key={index}>

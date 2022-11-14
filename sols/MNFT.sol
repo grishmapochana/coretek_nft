@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/utils/Counters.sol";
 // import "hardhat/console.sol";
 
-contract NFT is ERC721URIStorage {
+contract MNFT is ERC721URIStorage {
     using Counters for Counters.Counter;
     Counters.Counter private _tokenIds;
 
@@ -25,6 +25,8 @@ contract NFT is ERC721URIStorage {
         _mint(msg.sender, newItemId);
         _creators[newItemId] = msg.sender;
         _setTokenURI(newItemId, tokenURI);
+
+        // console.log("Unlock time is %o and block timestamp is %o", unlockTime, block.timestamp);
         
         // Give the marketplace approval to transact NFTs between users
         setApprovalForAll(marketplaceAddress, true);
@@ -73,5 +75,40 @@ contract NFT is ERC721URIStorage {
         }
 
         return createdTokenIds;
+    }
+
+    function getAllTokensOwnedBy(address addr) public view returns (uint256[] memory) {
+        uint256 numberOfExistingTokens = _tokenIds.current();
+        uint256 numberOfTokensOwned = balanceOf(addr);
+        uint256[] memory ownedTokenIds = new uint256[](numberOfTokensOwned);
+
+        uint256 currentIndex = 0;
+        for (uint256 i = 0; i < numberOfExistingTokens; i++) {
+            uint256 tokenId = i + 1;
+            if (ownerOf(tokenId) != addr) continue;
+            ownedTokenIds[currentIndex] = tokenId;
+            currentIndex += 1;
+        }
+
+        return ownedTokenIds;
+    }
+
+    function getAllTokens() public view returns (uint256[] memory) {
+        uint256 numberOfExistingTokens = _tokenIds.current();
+
+        uint256[] memory createdTokenIds = new uint256[](numberOfExistingTokens);
+        uint256 currentIndex = 0;
+        for (uint256 i = 0; i < numberOfExistingTokens; i++) {
+            uint256 tokenId = i + 1;
+            createdTokenIds[currentIndex] = tokenId;
+            currentIndex += 1;
+        }
+
+        return createdTokenIds;
+    }
+
+    function getLatestToken() public view returns (uint256) {
+        uint256 numberOfExistingTokens = _tokenIds.current();
+        return numberOfExistingTokens;
     }
 }

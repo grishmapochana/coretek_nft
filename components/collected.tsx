@@ -2,6 +2,7 @@ import React from "react";
 import { useWeb3React } from "@web3-react/core";
 import { etherToWei, getFormatedNft, nftInstance, nftMarketplaceInstance, tokenInstance } from "../helper/web3function";
 import { toast, ToastContainer } from "react-toastify";
+import NftCard from "./nftCard";
 declare let window: any;
 
 
@@ -19,6 +20,7 @@ export default function Collected() {
 
   React.useEffect(() => {
     if (account) getNFT();
+    console.log("hi there")
   }, [account]);
 
   const getNFT = async () => {
@@ -84,6 +86,19 @@ export default function Collected() {
   return (
     <div>
       <div className="grid grid-cols-5 gap-6 my-10">
+        {nftData.length > 0 && (
+          nftData.map((item: any, index: number) => (
+              <NftCard
+                key={index}
+                image={item.image}
+                name={item.name}
+                price={item.price}
+                desc={item.desc}
+                tokenId={item.token}
+              />
+            )
+        ))}
+        
         {nftData.length > 0 ? (
           nftData.map((item: any, index: number) => {
             return (

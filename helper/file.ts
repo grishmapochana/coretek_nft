@@ -1,7 +1,7 @@
 const BASE_URL: string = "http://52.52.130.184:9999";
 
 export async function uploadFile(
-  file: any,
+  file: File,
   fileNameWithExt: string,
   folderName: string = "/"
 ) {
@@ -44,10 +44,16 @@ export function createJSONFile(obj: object, fileName: string = "test") {
   return new File([blob], fn);
 }
 
+export async function getJSONMetadataBy(url: string) {
+  let res = await fetch(url);
+  return await res.json();
+}
+
 export async function getJSONMetadata(
   fileName: string,
   folderName: string = "/"
 ) {
+  console.log({ fileName, folderName });
   let fn = fileName;
   if (!fileName) {
     console.log("please input the fileName");
@@ -60,6 +66,8 @@ export async function getJSONMetadata(
   }
   if (!folderName.startsWith("/")) folderName = "/" + folderName;
   if (!folderName.endsWith("/")) folderName = folderName + "/";
+  
+  // return await getJSONMetadata(BASE_URL + folderName + fn);
   let res = await fetch(BASE_URL + folderName + fn);
   return await res.json();
 }

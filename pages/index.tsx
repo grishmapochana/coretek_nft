@@ -1,83 +1,137 @@
 import React from "react";
 import type { NextPage } from "next";
-import Image from "next/image";
-
-import Hardhat from "../assets/hardhat.png";
-import {
-  getFormatedMarketplaceNft,
-  getFormatedNft,
-  nftMarketplaceInstance,
-  tokenInstance,
-  weiToEther,
-} from "../helper/web3function";
-import Link from "next/link";
-import { useWeb3React } from "@web3-react/core";
+// import {
+//   getFormatedMarketplaceNft,
+//   nftMarketplaceInstance
+// } from "../helper/web3function";
+import NftCard from "../components/nftCard";
+import { useAppState } from "../helper/AppStateProvider";
 
 declare let window: any;
 
 const Home: NextPage = () => {
-  const { account } = useWeb3React();
+  const { getAppState } = useAppState();
+
   const [nftData, setNftData] = React.useState<{ [key: string]: any }>([]);
 
   React.useEffect(() => {
-    getNFT();
+    getMyNFTs();
   }, []);
 
-  const getNFT = async () => {
-    if (window.ethereum) {
-      try {
-        const marketplaceInstance = await nftMarketplaceInstance(account);
-        const unSoldNfts =
-          await marketplaceInstance!.fetchAvailableMarketItems();
-        const formattedNFTList = await Promise.all(
-          unSoldNfts.map((nft: any) => {
-            var res = getFormatedMarketplaceNft(nft, account);
-            return res;
-          })
-        );
-        setNftData(formattedNFTList);
-      } catch (err) {
-        console.log(err);
-      }
+  // const { getContracts, getProviderNSigner } = useAppState();
+  // const [nfts, setNfts] = React.useState<{ [key: string]: any }>([]);
+
+  // useEffect(() => {
+  //   getMyNFTs();
+  // }, []);
+
+  // transferfrom
+  // alltokens
+  // alltokensBy(address)
+
+  //   const getMintedNFTs = async (address?: string) => {
+  //     try {
+  //       const [_, nftContract] = getContracts();
+  //       if(nftContract) {
+  //         let mintedNftIDs: BigNumber[]
+  //         if(!address) {
+  //           mintedNftIDs = await nftContract.getTokensCreatedByMe();
+  //         } else {
+  //           mintedNftIDs = await nftContract.latest
+  //         }
+
+  //         if(mintedNftIDs && mintedNftIDs.length > 0) {
+  //           const nfts = await Promise.all(
+  //             mintedNftIDs.map(async (tokenId) => {
+  //               let tokenUri = await nftContract.tokenURI(tokenId);
+  //               let nftData = await getJSONMetadataBy(tokenUri);
+  //               return nftData;
+  //             })
+  //           )
+  //           setNfts(nfts);
+  //         } else {
+  //           console.log("no minted nfts found", {});
+  //         }
+  //       } else {
+  //         console.log("getMintedNFTs", "nftContract is required")
+  //       }
+  //     } catch (err: any) {
+  //       console.log(err.message, err);
+  //     }
+  // };
+
+  const getMyNFTs = async () => {
+    try {
+      const {erc20Contract, nftContract, marketplaceContract, signer} = getAppState();
+      console.log({ erc20Contract, nftContract, marketplaceContract, signer });
+      
+      // const [_, nftContract] = getContracts();
+      // console.log("📌 👉 👨‍💻 getMyNFTs 👨‍💻 nftContract", nftContract);
+      // const [, signer] = getProviderNSigner();
+      // if (nftContract && signer) {
+      //   const mintedNftIDs = await nftContract
+      //     .connect(signer)
+      //     .getTokensCreatedByMe();
+      //   const nfts = await Promise.all(
+      //     mintedNftIDs.map(async (tokenId) => {
+      //       let tokenUri = await nftContract.tokenURI(tokenId);
+      //       let nftData = await getJSONMetadataBy(tokenUri);
+      //       nftData.token = tokenId;
+      //       return nftData;
+      //     })
+      //   );
+      //   console.log(nfts);
+      //   setNfts(nfts);
+      // } else {
+      //   console.log("getMyNFTs", "nftContract && signer are required");
+      // }
+    } catch (err: any) {
+      console.log(err.message, err);
     }
   };
 
+  // const getNFT = async () => {
+  //   try {
+  //     const [_, nftContract] = getContracts();
+  //     console.log({ nftContract });
+  //   } catch (error) {
+  //     console.log(error);
+  //   }
+    // if (window.ethereum) {
+    //   try {
+    //     const marketplaceInstance = await nftMarketplaceInstance(account);
+    //     const unSoldNfts =
+    //       await marketplaceInstance!.fetchAvailableMarketItems();
+    //     const formattedNFTList = await Promise.all(
+    //       unSoldNfts.map((nft: any) => {
+    //         var res = getFormatedMarketplaceNft(nft, account);
+    //         return res;
+    //       })
+    //     );
+    //     setNftData(formattedNFTList);
+    //     console.log("📌 👉 👨‍💻 getNFT 👨‍💻 formattedNFTList", formattedNFTList);
+    //   } catch (err) {
+    //     console.log(err);
+    //   }
+    // }
+  // };
+
   return (
-    <>
-      <div className="p-20 bg-gray-100 min-h-screen">
-        <div className="m-2 text-5xl text-center">Marketplace</div>
-        <div className="grid grid-cols-5 gap-6 my-10">
-          {nftData.map((item: any, index: number) => {
-            console.log({image: item.image})
-            return (
-              item && (
-                <Link href={`/nft/${item.token}`} key={index}>
-                  <div className="shadow-lg rounded-lg overflow-hidden cursor-pointer hover:shadow-2xl">
-                    <div className="w-96 h-80 overflow-hidden">
-                      <img
-                        src={item.image}
-                        alt="Picture of the author"
-                        className="w-96 h-80 object-cover hover:scale-110 ease-in duration-300"
-                      />
-                    </div>
-                    <div className="px-4 py-2 flex flex-row justify-between">
-                      <div className="font-semibold">{item.name}</div>
-                      <div className="flex gap-2">
-                        <Image src={Hardhat} width={28} height={28} />
-                        <div className="text-right my-auto">{item.price}</div>
-                      </div>
-                    </div>
-                    <div className="px-4 py-2 text-xs">
-                      {item.desc}
-                    </div>
-                  </div>
-                </Link>
-              )
-            );
-          })}
-        </div>
+    <div className="p-20 bg-gray-100 min-h-screen">
+      <div className="m-2 text-5xl text-center">Marketplace</div>
+      <div className="grid grid-cols-5 gap-6 my-10">
+        {nftData.map((item: any, index: number) => (
+          <NftCard
+            key={index}
+            image={item.image}
+            name={item.name}
+            price={item.price}
+            desc={item.desc}
+            tokenId={item.token}
+          />
+        ))}
       </div>
-    </>
+    </div>
   );
 };
 
